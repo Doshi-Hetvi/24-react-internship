@@ -20,6 +20,25 @@ export const ServiceProviderDashboard = () => {
   const [totalBook, settotalBook] = useState([])
   const [doneBook, setdoneBook] = useState([]);
   const [amount, setamount] = useState([])
+  
+  const [lati, setlati] = useState()
+  const [longi, setlongi] = useState()
+
+  const getUserCurrentLocation = () => {
+    
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        console.log(position.coords.latitude);
+        console.log(position.coords.longitude);
+        setlati(position.coords.latitude)
+        setlongi(position.coords.longitude)
+        
+      });
+    } else {
+      console.log("Geolocation is not supported by this browser");
+    }
+  };
 
   const id = localStorage.getItem("id");
   const totalAmount = async () => {
@@ -89,7 +108,7 @@ export const ServiceProviderDashboard = () => {
 
         for (const service of res.data.data) {
           // service ma category che k nai check karse
-          if (service.category) {
+          if (service.category.name) {
             //category nu name set karse
             const categoryName = service.category.name;
             const categoryAmount = service.amount || 0;
@@ -99,7 +118,7 @@ export const ServiceProviderDashboard = () => {
               categoryCounts[categoryName]+= categoryAmount;
             } else {
               // navi category aave toh ene count ma add kari ne initial value 1 aapse
-              categoryCounts[categoryName] = 1;
+              categoryCounts[categoryName] = categoryAmount;
             }
           }
         }
@@ -122,7 +141,7 @@ export const ServiceProviderDashboard = () => {
       }
     } catch (error) {
       console.error("Error fetching service:", error);
-      alert("Error fetching service");
+      // alert("Error fetching service");
     }
   };
 
@@ -132,6 +151,7 @@ export const ServiceProviderDashboard = () => {
     getBooking();
     getDoneBooking();
     totalAmount();
+    getUserCurrentLocation()
   }, []);
 
   const [data, setdata] = useState({
@@ -172,7 +192,7 @@ export const ServiceProviderDashboard = () => {
           <h4>General Statistics</h4>
             <div className="row mt-3 mb-5">
               <div className="col-xl-4 col-sm-5">
-                <div className="card">
+                <div className="card shadow-dark">
                   <div className="card-header p-3 pt-2">
                     <div className="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute">
                       <i className="material-icons opacity-10 " style={{marginLeft:`25%`}}>manage</i>
@@ -191,7 +211,7 @@ export const ServiceProviderDashboard = () => {
                 </div>
               </div>
               <div className="col-xl-4 col-sm-5 ">
-                <div className="card">
+                <div className="card shadow-dark">
                   <div className="card-header p-3 pt-2">
                     <div className="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
                       <i className="material-icons opacity-10">person</i>
@@ -209,11 +229,11 @@ export const ServiceProviderDashboard = () => {
                 </div>
               </div>
               <div className="col-xl-4 col-sm-5">
-                <div className="card">
+                <div className="card shadow-dark">
                   <div className="card-header p-3 pt-2">
                     
                     <div className="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
-                      <i className="material-icons mb-1 opacity-10">paid</i>
+                      <i className="material-icons opacity-10">paid</i>
                     </div>
                     <div className="text-end pt-1">
                       <p className="text-sm mb-0 text-capitalize">Revenue</p><br />
@@ -228,16 +248,17 @@ export const ServiceProviderDashboard = () => {
               </div>
             </div>
           </div>
+          <div className='row'>
           <h4>Booked Services</h4>
-          <div className="row mb-5">
+          <div className="row mt-4 mb-4 ">
             {book?.map((booking) => {
               return (
-                <div className="col-lg-4 col-md-4 mt-2 mb-4">
-                  <div className="card z-index-2 ">
-                    <div className="card-header p-0 position-relative mt-n2 mx-3 z-index-2 bg-transparent">
-                      <div className=" border-radius-lg py-2 pe-1">
-                        <div className="chart">
-                          <img src={booking?.service?.imageUrl} style={{ margin: `1%`, height: `200px`, width: `100%`, objectFit: `cover` }} />
+                <div className="col-lg-4 col-md-4 mt-2 mb-5 ">
+                  <div className="card z-index-2 shadow-dark">
+                    <div className="card-header p-0 position-relative mt-n4 mx-3 border-radius-lg z-index-2 bg-transparent">
+                      <div className=" border-radius-lg py-2 pe-1 ">
+                        <div className="chart ">
+                          <img className='border-radius-lg shadow-dark' src={booking?.service?.imageUrl} style={{ margin: `1%`, height: `200px`, width: `100%`, objectFit: `cover` }} />
                         </div>
                       </div>
                     </div>
@@ -247,17 +268,20 @@ export const ServiceProviderDashboard = () => {
                       <p className="text-sm ">{booking?.service?.area}</p>
                       <p className="text-sm ">{booking?.service?.city}</p>
                       <p className="text-sm ">{booking?.service?.amount}</p>
+                      <h6 className="text-sm ">{booking.status}</h6>
                     </div>
                   </div>
                 </div>
               );
             })}
           </div>
+          </div>
+          <div className='row'>
           <h4>Revenue Chart</h4>
-          <div className="container-fluid mt-3 mb-8">
+          <div className="container-fluid mt-2">
             <div className="row justify-content-center">
-              <div className="col-lg-12">
-                <div className="card">
+              <div className="col-lg-10">
+                <div className="card shadow-dark">
                   <div
                     className="card-header bg-gradient-primary"
                     style={{
@@ -275,6 +299,7 @@ export const ServiceProviderDashboard = () => {
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ import {
 } from "chart.js";
 import axios from "axios";
 import { Bar } from 'react-chartjs-2';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 Chart.register(CategoryScale);
 Chart.register(ArcElement);
 Chart.register(LinearScale);
@@ -23,6 +23,7 @@ export const UserDashboard = () => {
   const [book, setbook] = useState([])
   const [lati, setlati] = useState()
   const [longi, setlongi] = useState()
+  const navigate = useNavigate()
 
 
   const getUserCurrentLocation = () => {
@@ -146,7 +147,7 @@ export const UserDashboard = () => {
       }
     } catch (error) {
       console.error("Error fetching service:", error);
-      alert("Error fetching service");
+      // alert("Error fetching service");
     }
   };
   
@@ -188,12 +189,13 @@ export const UserDashboard = () => {
           rel="stylesheet"
         />
       </Helmet>
-      <div className='bg-gray-200' style={{ marginLeft: `3%` }} >
+      <div className='bg-gray' >
         <div className="container-fluid py-4">
           <div className="row">
-            <div className="row mt-5">
-              <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 me-5">
-                <div className="card">
+          <h4>General Statistics</h4>
+            <div className="row mt-3 mb-5">
+            <div className="col-xl-4 col-sm-5">
+                <div className="card shadow-dark">
                   <div className="card-header p-3 pt-2">
                     <div className="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute">
                       <i className="material-icons opacity-10">weekend</i>
@@ -211,8 +213,8 @@ export const UserDashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-xl-3 col-sm-6 mb-xl-0 mb-4 me-5">
-                <div className="card">
+              <div className="col-xl-4 col-sm-5">
+                <div className="card shadow-dark">
                   <div className="card-header p-3 pt-2">
                     <div className="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
                       <i className="material-icons opacity-10">person</i>
@@ -229,8 +231,8 @@ export const UserDashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-xl-3 col-sm-6 me-5">
-                <div className="card">
+              <div className="col-xl-4 col-sm-5">
+                <div className="card shadow-dark">
                   <div className="card-header p-3 pt-2">
                     <div className="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
                       <i className="material-icons opacity-10">weekend</i>
@@ -247,10 +249,11 @@ export const UserDashboard = () => {
               </div>
             </div>
           </div>
-            <div className="row mt-6">
+          <h4>Pending Booking</h4>
+            <div className="row mt-4 mb-4">
             <div className="col-20">
-              <div className="card mb-4 ">
-                <div className="d-flex">
+              <div className="card mb-4 shadow-dark">
+                {/* <div className="d-flex ">
                   <div className="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-xl mt-n3 ms-4">
                     <i
                       className="material-icons opacity-10"
@@ -259,8 +262,22 @@ export const UserDashboard = () => {
                       language
                     </i>
                   </div>
-                  <h6 className="mt-3 mb-2 ms-3">Pending Booking</h6>
-                </div>
+                  <div className="text-end pt-1">
+                      <p className="text-sm mb-0 text-capitalize">Pending Booking</p><br />
+                    </div>
+                  
+                </div> */}
+                <div>
+                    <div className="icon icon-lg icon-shape bg-gradient-primary shadow-dark text-center border-radius-xl mt-n3 position-absolute "style={{marginLeft:`3%`}}>
+                      <i className="material-icons opacity-10 ">language</i>
+                    </div>
+                    <div className="text-end pt-3 " style={{marginRight:`3%`}}>
+                      <h6 className="text-sm mb-0 text-capitalize">
+                        Pending Booking
+                      </h6><br />
+                     
+                    </div>
+                  </div>
                 <div className="card-body p-3">
                   <div className="row">
                     <div className="col-lg-12 col-md-7">
@@ -269,10 +286,14 @@ export const UserDashboard = () => {
                           <thead>
                             <tr>
                               <th className="text-uppercase  text-xs font-weight-bold mb-0">
-                                Service Name
+                              Image
+                               
                               </th>
                               <th className="text-uppercase text-xs font-weight-bold mb-0">
-                                Total Amount
+                              Service Name
+                              </th>
+                              <th className="text-uppercase text-xs font-weight-bold mb-0">
+                              Total Amount
                               </th>
                               <th className="text-uppercase text-xs font-weight-bold mb-0">
                                 Status
@@ -289,6 +310,12 @@ export const UserDashboard = () => {
                                 <tr>
                                   <td style={{ paddingLeft: `25px` }}>
                                     <div className="d-flex flex-column justify-content-center">
+                                      <img className="text-xs font-weight-bold mb-0" src={booking?.service?.imageUrl} />
+                                        
+                                    </div>
+                                  </td>
+                                  <td style={{ paddingLeft: `25px` }}>
+                                    <div className="d-flex flex-column justify-content-center">
                                       <p className="text-xs font-weight-bold mb-0">
                                         {booking?.service?.servicename}
                                       </p>
@@ -299,19 +326,20 @@ export const UserDashboard = () => {
                                       {booking?.service?.amount}
                                     </p>
                                   </td>
+                                
                                   <td style={{ paddingLeft: `20px` }}>
                                     <p className="text-xs font-weight-bold mb-0">
                                       {booking.status}
                                     </p>
                                   </td>
+                                  
                                   <td className="align-middle text-center text-sm" style={{ paddingLeft: `30px`, paddingTop: `20px` }}>
-                                    <button className="btn btn-primary">
-                                      <Link
-                                        to={`/user/payment/${booking._id}`}
-                                        style={{ color: `white` }}
-                                      >
+                                    <button className="btn btn-primary" onClick={() => {
+                                      navigate(`/user/payment/${booking._id}`)
+                                    }}>
+                                      
                                         PAY NOW
-                                      </Link>
+                                      
                                     </button>
                                   </td>
                                 </tr>
@@ -320,16 +348,18 @@ export const UserDashboard = () => {
                           </tbody>
                         </table>
                       </div>
+
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="container-fluid mt-5 mb-8">
+          <h4>Revenue Chart</h4>
+          <div className="container-fluid mt-3">
             <div className="row justify-content-center">
-              <div className="col-lg-8">
-                <div className="card">
+              <div className="col-lg-10">
+                <div className="card shadow-dark">
                   <div
                     className="card-header bg-gradient-primary"
                     style={{

@@ -1,13 +1,14 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CustomLoader } from "../CustomLoader";
 
 export const MyService = () => {
 
   const [serviceprovider, setserviceprovider] = useState([])
   const [isLoading, setisLoading] = useState(false)
+  const navigate = useNavigate()
 
   const id = localStorage.getItem("id");
   const fetchMyService = async () => {
@@ -78,7 +79,7 @@ export const MyService = () => {
       </Helmet>
       {isLoading ? <CustomLoader/> : 
       <div className="col-md-12" style={{height: 730}}>
-        <div className="card strpied-tabled-with-hover">
+        <div className="card strpied-tabled-with-hover shadow-dark mt-2">
           <div className="card-header " style={{ height: 100 }}>
             <h4 className="card-title">My Service</h4>
             <p className="card-category">Here is your added service</p>
@@ -103,11 +104,11 @@ export const MyService = () => {
                       <td>{ser?.category?.name}</td>
                       <td>{ser?.subCategory?.name}</td>
                       <td>
-                        <button className="btn btn-info"  onClick={() => { }}>
-                          <Link to={`/serviceprovider/detail/${ser._id}`}>DETAILS</Link>
+                        <button className="btn btn-primary"  onClick={() => { navigate(`/serviceprovider/detail/${ser._id}`)}}>
+                          DETAILS
                         </button>
                       </td>
-                      <td><button className="btn btn-success" ><Link to={`/serviceprovider/update/${ser._id}`}>UPDATE</Link></button></td>
+                      <td><button className="btn btn-success" onClick={() => { navigate(`/serviceprovider/update/${ser._id}`)}}>UPDATE</button></td>
                       <td><button className="btn btn-danger" onClick={() => { deleteService(ser._id) }}>DELETE</button></td>
                     </tr>
                   );

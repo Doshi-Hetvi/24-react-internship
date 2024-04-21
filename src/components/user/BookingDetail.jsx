@@ -1,20 +1,13 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CustomLoader } from '../CustomLoader';
 
 export const BookingDetail = () => {
   const [isLoading, setisLoading] = useState(false)
   const [booking, setbooking] = useState([])
-  const cards = [
-    {
-      id: 1,
-      title: "Card 1",
-      content: "This is the content of Card 1",
-      imageUrl: "https://via.placeholder.com/150",
-    },
-  ];
+  const navigate = useNavigate()
 
   const id = useParams().id
   const bookingdetail = async () => {
@@ -66,40 +59,39 @@ export const BookingDetail = () => {
         />
       </Helmet>
       {isLoading ? <CustomLoader /> :
-        <div className='card card-body '>
-          <div className="col-12 mt-2">
+        <div className='main-content border-radius-lg' style={{ marginLeft: 130, objectFit: 'cover', height: `100%` }}>
+          <div className="container-fluid mt-4">
             <div className="row">
-              {cards.map((card) => (
-                <div key={card.id} className="col-xl-4 col-md-6 mb-4">
-                  <div className="card card-blog card-plain">
-
-                    <div className="card-body">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: 300 }}>
-                        <h6>Service -</h6>
-                        <h5 className="card-title">{booking?.service?.servicename}</h5>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: 300 }}>
-                        <h6>Amount -</h6>
-                        <div>{booking?.amount}</div>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: 300 }}>
-                        <h6>Status -</h6>
-                        <div>{booking?.status}</div>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: 300 }}>
-                        <h6>ServiceProvider -</h6>
-                        <div>{booking?.serviceprovider?.name}</div>
-                      </div>
-                      <Link to="/user/viewbooking">
-                        <input type="submit" value="Back" className="btn btn-success" />
-                      </Link>
+              <div class="col-8">
+                <div class="card my-4 bg-gray-100 shadow-dark">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 shadow-dark">
+                    <div class="bg-gradient-secondary shadow-secondary border-radius-lg pt-2 pb-1">
+                      <h5 class="text-white text-capitalize ps-3" style={{ textAlign: `center` }}>Order Details</h5>
                     </div>
                   </div>
+                  <div class="card-body px-4" >
+                    <div className="chart mb-3">
+                      <img src={booking.service?.imageUrl} style={{ marginLeft: 150, marginTop: 15 }} />
+                    </div>
+
+                    <h4>{booking?.service?.servicename}</h4>
+                    <h6>Service Provider - {booking?.serviceprovider?.name}</h6>
+                    <h6>Service Description - {booking?.service?.servicedescription}</h6>
+
+                    <h6>Service Price - {booking?.service?.amount}</h6>
+                    <h6 className='mb-2'>Status - {booking?.status}</h6>
+
+                    
+                    <button type='submit' onClick={() => { navigate("/user/viewbooking") }} className="btn btn-info" style={{width:`35%`,marginLeft:`33%`}} >Back</button>
+                    
+                  </div>
+
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
+
       }
     </>
   )

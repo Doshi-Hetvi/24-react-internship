@@ -21,20 +21,24 @@ import { UserProfile } from './components/user/UserProfile';
 import { ForgotPassword } from './components/ForgotPassword';
 import { ResetPassword } from './components/ResetPassword';
 import { BookingDetail } from './components/user/BookingDetail';
+import { UpdateServiceProviderProfile } from './components/serviceprovider/UpdateServiceProviderProfile';
+import { UpdateUserProfile } from './components/user/UpdateUserProfile';
+import { Index } from './components/Index';
 
 function App() {
   const path = window.location.pathname
   return (
-    <body className='g-sidenav-show bg-gray-200'>
-      {path === "" || path === "/login" || path === "/" || path === "/register" || path === "/forgot" ||path === "/reset" ? null : <SideBar />}
+    <body className='g-sidenav-show'>
+      {path === "" || path === "/login" || path === "/" || path === "/register" || path === "/forgot" ||path === "/reset"  || path==="/logout"? null : <SideBar />}
       <main className='main-content'>
         <div className='container-fluid'>
           <Routes>
-            <Route path='/' element={<Login />}></Route>
-            
+            <Route path='/login' element={<Login />}></Route>
+            <Route path='/' element={<Index />}></Route>
             <Route path='/register' element={<Registration />}></Route>
             <Route path='/forgot' element={<ForgotPassword />}></Route>
             <Route path='/reset' element={<ResetPassword/>}></Route>
+            
             <Route element={<ProtectedRoute />}>
             <Route path='/serviceprovider/dashboard' element={<ServiceProviderDashboard />} ></Route>
             <Route path='/serviceprovider/addservice' element={<AddService />} ></Route>
@@ -42,6 +46,9 @@ function App() {
             <Route path='/serviceprovider/detail/:id' element={<Detail />}></Route>
             <Route path='/serviceprovider/update/:id' element={<UpdateService />}></Route>
             <Route path='/serviceprovider/serviceproviderprofile' element={<ServiceProviderProfile />}></Route>
+            <Route path='/serviceprovider/updateProfile' element={<UpdateServiceProviderProfile />}></Route>
+
+
             <Route path='/user/userdashboard' element={<UserDashboard />} ></Route>
             <Route path='/user/bookservice' element={<BookService />} ></Route>
             <Route path='/user/viewbooking' element={<ViewService />} ></Route>
@@ -49,6 +56,7 @@ function App() {
             <Route path='/user/payment/:id' element={<Payment />} ></Route>
             <Route path='/user/booking/:id' element={<MyBooking />} ></Route>
             <Route path='/user/bookingdetail/:id' element={<BookingDetail />} ></Route>
+            <Route path='/user/updateProfile' element={<UpdateUserProfile />}></Route>
             <Route path='/logout' element={<Logout />}></Route>
           </Route>
           </Routes>

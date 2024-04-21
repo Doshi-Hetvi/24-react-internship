@@ -8,14 +8,7 @@ export const Detail = () => {
   const [service, setservice] = useState([])
   const [isLoading, setisLoading] = useState(false)
   const navigate = useNavigate()
-  const cards = [
-    {
-      id: 1,
-      title: "Card 1",
-      content: "This is the content of Card 1",
-      imageUrl: "https://via.placeholder.com/150",
-    },
-  ];
+
   const id = useParams().id;
 
   const submitHandler = async () => {
@@ -24,16 +17,13 @@ export const Detail = () => {
       const res = await axios.get("http://localhost:4000/services/service/" + id)
       console.log(res.data.data);
       setservice(res.data.data);
-      
+
     } catch (error) {
       console.log(error);
     }
     setisLoading(false)
   }
-  
-  const back = async () =>{
-    navigate("/serviceprovider/myservice")
-  }
+
 
   useEffect(() => {
     submitHandler()
@@ -67,57 +57,56 @@ export const Detail = () => {
           rel="stylesheet"
         />
       </Helmet>
-      {isLoading ? <CustomLoader/> : 
-      <div className='card card-body '>
-        <div className="col-12 mt-2">
-          <div className="row">
-            {cards.map((card) => (
-              <div key={card.id} className="col-xl-4 col-md-6 mb-4">
-                <div className="card card-blog card-plain">
-                  <div className="card-header p-0 mt-n1 mx-2">
-                    <div className="d-block shadow-xl border-radius-xl">
-                      <img
-                        src={service.imageUrl}
-                        className="card-img-top"
-                        alt={`Card ${service._id}`}
-                      />
+      {isLoading ? <CustomLoader /> :
+        <div className='main-content border-radius-lg' style={{ marginLeft: 130, objectFit: 'cover', height: `100%` }}>
+          <div className="container-fluid py-3">
+            <div className="row">
+              <div class="col-8">
+                <div class="card my-4 bg-gray-100 shadow-dark">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 shadow-dark">
+                    <div class="bg-gradient-secondary shadow-secondary border-radius-lg pt-2 pb-1">
+                      <h5 class="text-white text-capitalize ps-3" style={{ textAlign: `center` }}>Details</h5>
                     </div>
                   </div>
-                  <div className="card-body">
-                    <h5 className="card-title">{service.servicename}</h5>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: 280 }}>
-                      <h6>Category -</h6> <p >{service?.category?.name}</p>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: 380 }}>
-                    <h6>SubCategory -</h6><p >{service?.subCategory?.name}</p>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: 250 }}>
-                    <h6>Type -</h6><p>{service?.type?.name}</p>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: 250 }}>
-                    <h6>Amount -</h6> <p>{service?.amount}</p>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: 250 }}>
-                    <h6>Area -</h6><p>{service?.area}</p>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: 250 }}>
-                    <h6>City -</h6> <p>{service?.city}</p>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: 250 }}>
-                    <h6>State -</h6> <p>{service?.state}</p>
-                    </div>
-                   <button type='submit' onClick={()=> {back()}}  className="btn btn-success" >Back</button>
-                    {/* <Link to="/serviceprovider/myservice">
-                        <input type="submit" value="Back" className="btn btn-success" />
-                      </Link> */}
-                  </div>
-                </div>
+                  <div class="card-body px-4" >
+                    {/* <div className="row "> */}
+                      {/* <div className="col-lg-5 mb-lg-0 mb-4"> */}
+                        {/* <div  style={{width:700}}> */}
+                          {/* <div className="card-body mt-n0 px-3">
+                            <div className="bg-gradient-dark shadow-black border-radius-lg py-2"> */}
+                              <div className="chart mb-3">
+                                <img src={service.imageUrl} style={{marginLeft:150,marginTop:15}} />
+                              </div>
+                            {/* </div>
+                            </div> */}
+
+                          {/* <div className="col-lg-7" >
+                            <div className="card z-index-2 shadow-dark border-radius-lg"> */}
+                              {/* <div className="card-header pb-0 "> */}
+                              {/* <div className='card-header'> */}
+                              
+                              <h4>{service.servicename}</h4>
+                              <h6>Category : {service?.category?.name}</h6>
+                              <h6>Subcategory : {service?.subCategory?.name}</h6>
+                              <h6>Description : {service.servicedescription}</h6>
+                              <h6>Type : {service?.type?.name}</h6>
+                              <h6>Fees : {service.amount}</h6>
+                              <h6>Area : {service.area}</h6>
+                              <h6>City : {service.city}</h6>
+                              <h6 >State : {service.state}</h6>
+                              <div className="text-center mt-3" style={{ display: 'flex', justifyContent: 'space-between', width: 300,marginLeft:110}}>
+                              <button type='submit' onClick={() => { navigate(`/serviceprovider/update/${service._id}`) }} className="btn btn-primary" >Change</button>
+                              <button type='submit' onClick={() => { navigate("/serviceprovider/myservice") }} className="btn btn-info" >Back</button>
+                              </div>  
+                              
+                            </div>
+                          </div>
+                        </div>
+                      </div>
               </div>
-            ))}
-          </div>
+             
         </div>
-      </div>
-}
+      }
     </>
   )
 }

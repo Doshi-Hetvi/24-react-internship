@@ -2,75 +2,122 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
 import { CustomLoader } from '../CustomLoader';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 
 export const UpdateService = () => {
-  const id = useParams().id;
-  const [categories, setcategories] = useState([]);
-  const [subCategories, setsubcategory] = useState([]);
-  const [type, settype] = useState([]);
+  const [service, setservice] = useState([])
+  const [type, settype] = useState([])
+  const [categories, setcategories] = useState([])
+  const [subCategories, setSubcategories] = useState([])
+  const [selectedCategory, setselectedCategory] = useState("")
+  const id = useParams().id
   const [isLoading, setisLoading] = useState(false)
   const navigate = useNavigate()
 
+
   const submitHandler = async (data) => {
     try {
-      setisLoading(true)
-      const res = await axios.put(
-        "http://localhost:4000/services/service/" + id,
-        data
-      );
+      setisLoading(true);
 
+      const res = await axios.put(`http://localhost:4000/services/service/${id}`, data);
+
+      // const res = await axios.put(`http://localhost:4000/services/service/${id}`, data);
+      console.log(res.data.data);
+      setservice(res.data.data)
       if (res.status === 200) {
-       navigate("/serviceprovider/myservice");
+        toast.success("🦄 Update Successfully!", {
+          position: "top-center",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+        setTimeout(() => {
+          navigate("/serviceprovider/myservice");
+        }, 3000);
       }
-      setisLoading(false)
-    } catch (error) {
-      console.log(error);
+
+    } catch (err) {
+      console.log(err);
+      alert("Please enter Category,Subcategory and Type")
     }
-  };
-  const loadType = async () => {
-    const res = await axios.get("http://localhost:4000/types/type");
-    console.log(res.data.data);
-    settype(res.data.data);
+    setisLoading(false);
   };
 
-  const loadSubCategories = async () => {
-    const res = await axios.get(
-      "http://localhost:4000/subCategories/subCategory"
-    );
+  const handleCategoryChange = (e) => {
+    const categoryId = e.target.value;
+    console.log("Selected category:", categoryId);
+
+    setselectedCategory(categoryId)
+    loadSubCategory(categoryId)
+
+  }
+
+  const loadType = async () => {
+
+    const res = await axios.get('http://localhost:4000/types/type')
     console.log(res.data.data);
-    setsubcategory(res.data.data);
-  };
+    settype(res.data.data)
+  }
+
   const loadCategories = async () => {
-    const res = await axios.get("http://localhost:4000/categories/category");
+    const res = await axios.get('http://localhost:4000/categories/category');
     console.log(res.data.data);
     setcategories(res.data.data);
-  };
+  }
+
+  const loadSubCategory = async (categoryId) => {
+    try {
+      console.log("Loading Subcategory for category:", categoryId);
+      const res = await axios.get(`http://localhost:4000/subCategories/subcategorybycategory/${categoryId}`)
+      console.log(res.data.data);
+      setSubcategories(res.data.data)
+    }
+    catch (err) {
+      console.log("Error loading subcategories:", err);
+    }
+  }
+
+
   const { register, handleSubmit } = useForm({
     defaultValues: async () => {
-      const res = await axios.get(
-        "http://localhost:4000/services/service/" + id
-      );
-
+      const res = await axios.get(`http://localhost:4000/services/service/${id}`)
       return {
         servicename: res.data.data.servicename,
-        category : res.data.data.category.name,
-        subCategory : res.data.data.subCategory.name,
-        type: res.data.data.type.name,
-        city:res.data.data.city,
+        servicedescription: res.data.data.servicedescription,
         amount: res.data.data.amount,
-        area: res.data.data.area,
+        city: res.data.data.city,
         state: res.data.data.state,
-        myImage : res.data.data.imageUrl,
-      };
-    },
-  });
+        area: res.data.data.area,
+        // imageUrl: res.data.data.imageUrl
+      }
+    }
+  })
+
+
   useEffect(() => {
-    loadCategories();
-    loadSubCategories();
+
     loadType();
-  }, []);
+    loadCategories();
+    setselectedCategory(categories[0]?._id)
+
+
+  }, [])
+
+
+  useEffect(() => {
+    if (selectedCategory) {
+
+      loadSubCategory(selectedCategory);
+    }
+
+  }, [selectedCategory])
+
   return (
     <>
       <Helmet>
@@ -99,159 +146,129 @@ export const UpdateService = () => {
           rel="stylesheet"
         />
       </Helmet>
-      {isLoading ? <CustomLoader/> : 
-      <div className="card-plain card z-index-0 fadeIn3 fadeInBottom" style={{ width: 700, marginLeft: 200, marginTop: 15,height:940 }}>
-        <div className="card-header p-0 position-relative mt-n2 mx-2 z-index-2">
-          <div className=" shadow-primary border-radius-lg py-2 pe-1">
-            <div>
-              <h4 className="font-weight-bolder text-center" style={{ marginTop: 20 }}>Update services</h4>
-            </div>
-            <div className="card-body">
-              <form role="form" onSubmit={handleSubmit(submitHandler)} >
-                {/* <label className="form-label">Service Name: </label> */}
-                <div className="input-group input-group-outline mb-3" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div>
-                    <label className="form-label">Service Name : </label>
+      {isLoading ? <CustomLoader /> :
+        <div className="page-header align-items-start">
+          <ToastContainer
+            position="top-center"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+
+          />
+          <span className="mask  opacity-6 " />
+          <div className="container my-5">
+            <div className="row">
+              <div className="col-lg-0 col-md-8 col-12 mx-auto">
+                <div className="card z-index-0 fadeIn3 fadeInBottom shadow-dark">
+                  <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                    <div className="shadow-secondary bg-gradient-secondary border-radius-lg py-2 pe-1" >
+                      <h5 className="text-white font-weight-bolder text-center mt-2 mb-0">
+                        Update Services
+                      </h5>
+                    </div>
                   </div>
-                  <div>
-                    <input
-                      className="form-control"
-                      type="text"
-                      {...register("servicename")} style={{ width: 390 }}
-                    />
-                  </div>
-                </div>
-                {/* <label className="form-label">Select Category: </label> */}
-                <div className="input-group input-group-outline mb-3" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div>
-                    <label className="form-label">Select Category : </label>
-                  </div>
-                  <div>
-                    {/* <select className="form-control" {...register("category")} style={{ width: 390 }}>
-                      <option>Select Category</option>
-                      {categories?.map((cat) => {
-                        return (
-                          <>
-                            <option value={cat._id}>{cat.name}</option>
-                          </>
-                        );
-                      })}
-                    </select> */}
-                     <input
-                      className="form-control"
-                      type="text"
-                      {...register("category")} style={{ width: 390 }}
-                    />
-                  </div>
-                </div>
-                {/* <label className="form-label">Select SubCategory: </label> */}
-                <div className="input-group input-group-outline mb-3" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div><label className="form-label">Select SubCategory : </label></div>
-                  <div>
-                    {/* <select className="form-control" {...register("subCategory")} style={{ width: 390 }}>
-                      <option>Select SubCategory</option>
-                      {subCategories?.map((subcat) => {
-                        return (
-                          <>
-                            <option value={subcat._id}>{subcat.name}</option>
-                          </>
-                        );
-                      })}
-                    </select> */}
-                    <input
-                      className="form-control"
-                      type="text"
-                      {...register("subCategory")} style={{ width: 390 }}
-                    />
-                  </div>
-                </div>
-                {/* <label className="form-label">Select Type: </label> */}
-                <div className="input-group input-group-outline mb-3" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div><label className="form-label">Select Type : </label></div>
-                  <div>
-                    {/* <select className="form-control" {...register("type")} style={{ width: 390 }}>
-                      <option>Select Type</option>
-                      {type?.map((type) => {
-                        return (
-                          <>
-                            <option value={type._id}>{type.name}</option>
-                          </>
-                        );
-                      })}
-                    </select> */}
-                    <input
-                      className="form-control"
-                      type="text"
-                      {...register("type")} style={{ width: 390 }}
-                    />
-                  </div>
-                </div>
-                {/* <label className="form-label">Amount</label> */}
-                <div className="input-group input-group-outline mb-3" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div><label className="form-label">Amount : </label></div>
-                  <div>
-                    <input
-                      className="form-control"
-                      type="text"
-                      {...register("amount")} style={{ width: 390 }}
-                    />
-                  </div>
-                </div>
-                {/* <label className="form-label">Area</label> */}
-                <div className="input-group input-group-outline mb-3" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div><label className="form-label">Area : </label></div>
-                  <div>
-                    <input
-                      className="form-control"
-                      type="text"
-                      {...register("area")} style={{ width: 390 }}
-                    />
-                  </div>
-                </div>
-                {/* <label className="form-label">City</label> */}
-                <div className="input-group input-group-outline mb-3" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div>
-                    <label className="form-label">City : </label>
-                  </div>
-                  <div>
-                    <input
-                      className="form-control"
-                      type="text"
-                      {...register("city")} style={{ width: 390 }}
-                    />
+                  <div className="card-body">
+                    <form className="text-start" onSubmit={handleSubmit(submitHandler)}>
+                      <label className="form-label" style={{ margin: `1px` }}>Service Name</label>
+                      <div className="input-group input-group-outline my-2" >
+                        <input type="text" className="form-control" {...register("servicename")} />
+                      </div>
+                      <label className="form-label" style={{ margin: `1px` }}>Category</label>
+                      <div className="input-group input-group-outline my-2">
+                        <select className="form-control" {...register("category")} value={selectedCategory} onChange={handleCategoryChange}>
+                          <option>SELECT CATEGORY</option>
+                          {categories?.map((cat) => {
+                            return (
+                              <>
+                                <option value={cat._id}>{cat.name}</option>
+                              </>
+                            );
+                          })}
+                        </select>
+                      </div>
+                      <label className="form-label" style={{ margin: `1px` }}>Subcategory</label>
+                      <div className="input-group input-group-outline my-2">
+                        <select className="form-control" {...register("subCategory")}>
+                          <option>SELECT SUBCATEGORY</option>
+                          {subCategories?.map((subcat) => {
+                            return (
+                              <>
+                                <option value={subcat._id}>{subcat.name}</option>
+                              </>
+                            );
+                          })}
+                        </select>
+                      </div>
+                      <label className="form-label" style={{ margin: `1px` }}>Type</label>
+                      <div className="input-group input-group-outline my-2">
+                        <select className="form-control" {...register("type")}>
+                          <option>SELECT TYPE</option>
+                          {type?.map((type) => {
+                            return (
+                              <>
+                                <option value={type._id}>{type.name}</option>
+                              </>
+                            );
+                          })}
+                        </select>
+                      </div>
+                      <label className="form-label" style={{ margin: `1px` }}>Description</label>
+                      <div className="input-group input-group-outline mb-2">
+                        <input type="text" className="form-control" {...register("servicedescription")} />
+                      </div>
+
+                      <label className="form-label" style={{ margin: `1px` }}>Amount</label>
+                      <div className="input-group input-group-outline mb-2">
+                        <input type="text" className="form-control" {...register("amount")} />
+                      </div>
+                      <label className="form-label" style={{ margin: `1px` }}>Area</label>
+                      <div className="input-group input-group-outline mb-2">
+                        <input type="text" className="form-control" {...register("area")} />
+                      </div>
+                      <label className="form-label" style={{ margin: `1px` }}>City</label>
+                      <div className="input-group input-group-outline mb-2">
+                        <input type="text" className="form-control" {...register("city")} />
+                      </div>
+                      <label className="form-label" style={{ margin: `1px` }}>State</label>
+                      <div className="input-group input-group-outline mb-2">
+                        <input type="text" className="form-control" {...register("state")} />
+                      </div>
+                      {/* <label className="form-label">Upload Image</label> */}
+                      {/* <div className="input-group input-group-outline mb-4" style={{ display: 'flex', justifyContent: 'space-between' }}> */}
+                      {/* <div><label className="form-label">Upload Image : </label></div>
+                      <div>
+                        <input
+                          className="form-control"
+                          type="file"
+                          {...register("imageUrl")} style={{ width: 390 }}
+                        />
+                      </div> */}
+                      {/* </div> */}
+                      {/* <div className="text-center" style={{ display: 'flex', justifyContent: 'space-between', width: 300, marginLeft: 150 }}> */}
+                      <div className="text-center">
+                        <button
+                          type="submit"
+                          className="btn btn-outline-secondary w-40 my-4 mb-2"
+                        >
+                          Update Service
+                        </button>
+                      </div>
+
+                      {/* </div> */}
+                    </form>
                   </div>
                 </div>
-                {/* <label className="form-label">State</label> */}
-                <div className="input-group input-group-outline mb-3" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div><label className="form-label">State : </label></div>
-                  <div><input
-                    className="form-control"
-                    type="text"
-                    {...register("state")} style={{ width: 390 }}
-                  />
-                  </div>
-                </div>
-                {/* <label className="form-label">Upload Image</label> */}
-                <div className="input-group input-group-outline mb-4" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div><label className="form-label">Upload Image : </label></div>
-                  <div>
-                    <input
-                      className="form-control"
-                      type="file"
-                      {...register("myImage")} style={{ width: 390 }}
-                    />
-                  </div>
-                </div>
-                <div className="text-center" style={{ display: 'flex', justifyContent: 'space-between', width: 300, marginLeft: 150 }}>
-                  <input type="submit" value="submit" className="btn btn-success" />
-                  <input type="reset" value="reset" className="btn btn-danger" />
-                </div>
-              </form>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-}
+      }
     </>
   )
 }
